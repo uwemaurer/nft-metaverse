@@ -1,3 +1,6 @@
+import random from 'random';
+import seedrandom from 'seedrandom';
+
 /**
  *
  * This is a generic interface to load NFT information
@@ -17,10 +20,11 @@ export interface NFTProvider {
 }
 
 export class DemoNFTs implements NFTProvider {
+ private rnd = random.clone(seedrandom('demo demo'));
   getNFTs(address: string): Promise<NFT[]> {
     const nft = [] as NFT[];
     for (let i = 0; i < 200; i++) {
-      const i = Math.floor(Math.random() * 5472) + 1;
+      const i = this.rnd.int(1, 5472);
       const url = `https://goofballs.finemints.com/nft/${i}.png`;
       nft.push({ contract: '', name: '', tokenId: `${i}`, imageUrl: url });
     }
