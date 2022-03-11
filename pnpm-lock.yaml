@@ -5,6 +5,7 @@ specifiers:
   '@vitejs/plugin-vue': ^2.2.0
   generate-maze: ^1.1.0
   three: ^0.138.3
+  three-csg-ts: ^3.1.10
   vite: ^2.8.0
   vue: ^3.2.25
 
@@ -12,6 +13,7 @@ dependencies:
   '@types/three': 0.138.0
   generate-maze: 1.1.0
   three: 0.138.3
+  three-csg-ts: 3.1.10_f513be0a216343de32b5de41d5b45b3d
   vue: 3.2.31
 
 devDependencies:
@@ -429,6 +431,16 @@ packages:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
     dev: true
+
+  /three-csg-ts/3.1.10_f513be0a216343de32b5de41d5b45b3d:
+    resolution: {integrity: sha512-Li3tEokjlC91DoZ8tLNcikz0rq+O723Ot9s1q8FioyRDZvGZBP+paypBzfTYocoxBaDiXHcV0H81nWSQs8McZQ==}
+    peerDependencies:
+      '@types/three': '>= 0.125.0'
+      three: '>= 0.125.0'
+    dependencies:
+      '@types/three': 0.138.0
+      three: 0.138.3
+    dev: false
 
   /three/0.138.3:
     resolution: {integrity: sha512-4t1cKC8gimNyJChJbaklg8W/qj3PpsLJUIFm5LIuAy/hVxxNm1ru2FGTSfbTSsuHmC/7ipsyuGKqrSAKLNtkzg==}

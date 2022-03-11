@@ -17,7 +17,7 @@ The NFT metaverse is developed in Typescript, server and client side. It connect
 Rendering is based on WebGL using the Three.js library.
 
 - [Typescript](https://www.typescriptlang.org/)
-- [https://vitejs.dev/](Vite)
+- [Vite](https://vitejs.dev/)
 - [Three.js](https://threejs.org/e)
 - Web3 APIs 
 
