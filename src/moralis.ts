@@ -1,12 +1,15 @@
-import { moralisGetNFTs, moralisInit } from './moralis-helper';
+import { moralisGetNFTs, moralisInit, moralisSave } from './moralis-helper';
 import { NFT, NFTProvider } from './nft-api';
+import { ref } from 'vue';
+
+export const currentAddress = ref(null as string | null);
 
 export class MoralisProvider implements NFTProvider {
   async getNFTs(address: string): Promise<NFT[]> {
     await moralisInit();
     const response = await moralisGetNFTs(address);
-    return (response.result as any[]).map(
-      (it) => {
+    return (response.result as any[])
+      .map((it) => {
         // the metadata is returned as string field and needs to be parsed
         const meta = JSON.parse(it.metadata);
         const image = meta?.image;
@@ -16,7 +19,11 @@ export class MoralisProvider implements NFTProvider {
           tokenId: it.token_id,
           imageUrl: image,
         } as NFT;
-      }
-    ).filter(it => it.imageUrl);
+      })
+      .filter((it) => it.imageUrl);
+  }
+
+  async saveFile(file: string, data: any) {
+    await moralisSave(file, data);
   }
 }

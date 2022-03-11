@@ -6,6 +6,7 @@ import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
 import { FilmPass } from 'three/examples/jsm/postprocessing/FilmPass';
 import { createMaze } from './generateWorld';
+import { ref } from 'vue';
 
 let camera, scene:THREE.Scene, renderer, controls;
 
@@ -30,6 +31,11 @@ let composer: EffectComposer;
 
 const clock = new THREE.Clock();
 
+export const metaverseActive = ref(false);
+export function enterMetaverse() {
+  controls.lock();
+}
+
 export function init() {
   stats = Stats()
   camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 1, 1000);
@@ -50,21 +56,12 @@ export function init() {
 
   controls = new PointerLockControls(camera, document.body);
 
-  const blocker = document.getElementById('blocker');
-  const instructions = document.getElementById('instructions');
-
-  instructions.addEventListener('click', function () {
-    controls.lock();
-  });
-
   controls.addEventListener('lock', function () {
-    instructions.style.display = 'none';
-    blocker.style.display = 'none';
+    metaverseActive.value = true;
   });
 
   controls.addEventListener('unlock', function () {
-    blocker.style.display = 'block';
-    instructions.style.display = '';
+    metaverseActive.value = false;
   });
 
   scene.add(controls.getObject());
