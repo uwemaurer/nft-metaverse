@@ -1,7 +1,7 @@
 import { moralisGetNFTs, moralisInit } from './moralis-helper';
 import { NFT, NFTProvider } from './nft-api';
 
-export class MoralisNFTs implements NFTProvider {
+export class MoralisProvider implements NFTProvider {
   async getNFTs(address: string): Promise<NFT[]> {
     await moralisInit();
     const response = await moralisGetNFTs(address);

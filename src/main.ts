@@ -3,7 +3,8 @@
 import { init, animate } from './metaverse';
 import { NFTProvider, DemoNFTs } from './nft-api';
 import { addPainting } from './generateWorld';
-import { MoralisNFTs } from './moralis';
+import { MoralisProvider } from './moralis';
+import { NFTPortProvider } from './NFTport';
 
 //createApp(App).mount('#app')
 
@@ -14,12 +15,13 @@ async function main() {
   animate();
 
   //const provider = new DemoNFTs() as NFTProvider;
-  const provider = new MoralisNFTs() as NFTProvider;
+  //const provider = new MoralisProvider() as NFTProvider;
+  const provider = new NFTPortProvider() as NFTProvider;
 
   const nfts = await provider.getNFTs(goofballCommunityAddress);
   for (const nft of nfts) {
       console.log(nft);
-    addPainting(nft.imageUrl);
+      addPainting(nft.imageUrl);
   }
 }
 
