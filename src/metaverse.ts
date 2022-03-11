@@ -8,7 +8,7 @@ import { FilmPass } from 'three/examples/jsm/postprocessing/FilmPass';
 import { createMaze } from './generateWorld';
 import { ref } from 'vue';
 
-let camera, scene:THREE.Scene, renderer, controls;
+let camera, scene: THREE.Scene, renderer, controls: PointerLockControls;
 
 const objects = [];
 
@@ -36,8 +36,25 @@ export function enterMetaverse() {
   controls.lock();
 }
 
+/** Save the state, currently just camera position */
+interface State {
+  position: number[];
+  rotation: number[];
+}
+
+export function getState(): State {
+  const cam = controls.getObject();
+  return { position: cam.position.toArray(), rotation: cam.rotation.toArray() };
+}
+
+export function restoreState(state:State) {
+  controls.getObject().position.fromArray(state.position);
+  controls.getObject().rotation.fromArray(state.rotation);
+  controls.getObject().updateMatrix();
+}
+
 export function init() {
-  stats = Stats()
+  stats = Stats();
   camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 1, 1000);
   camera.position.y = 10;
 
@@ -66,6 +83,9 @@ export function init() {
 
   scene.add(controls.getObject());
   controls.getObject().position.y = eyeHeight;
+  controls.getObject().position.x = 2.5;
+  controls.getObject().position.z = 5.5;
+  controls.getObject().rotateY((Math.PI / 180) * 15);
 
   const onKeyDown = function (event) {
     switch (event.code) {
@@ -127,13 +147,11 @@ export function init() {
 
   const loader = new THREE.TextureLoader();
 
-  const sky = loader.load(
-    'sunflowers.jpg',
-    () => {
-      const rt = new THREE.WebGLCubeRenderTarget(sky.image.height);
-      rt.fromEquirectangularTexture(renderer, sky);
-      scene.background = rt.texture;
-    });
+  const sky = loader.load('sunflowers.jpg', () => {
+    const rt = new THREE.WebGLCubeRenderTarget(sky.image.height);
+    rt.fromEquirectangularTexture(renderer, sky);
+    scene.background = rt.texture;
+  });
 
   const maze = createMaze(scene);
   scene.add(maze);
@@ -144,19 +162,19 @@ export function init() {
   renderer.setSize(window.innerWidth, window.innerHeight);
   //renderer.outputEncoding = THREE.sRGBEncoding;
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap ; //PCFSoftShadowMap
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap; //PCFSoftShadowMap
 
   document.body.appendChild(renderer.domElement);
   window.addEventListener('resize', onWindowResize);
-  document.body.appendChild(stats.dom)
+  document.body.appendChild(stats.dom);
 
-  const renderModel = new RenderPass( scene, camera );
-  const effectFilm = new FilmPass( 0.35, 0.75, 2048, 0.2 );
+  const renderModel = new RenderPass(scene, camera);
+  const effectFilm = new FilmPass(0.35, 0.75, 2048, 0.2);
 
-  composer = new EffectComposer( renderer );
+  composer = new EffectComposer(renderer);
 
-  composer.addPass( renderModel );
-  composer.addPass( effectFilm );
+  composer.addPass(renderModel);
+  composer.addPass(effectFilm);
 }
 
 function createBoxes() {
@@ -237,11 +255,11 @@ export function animate() {
       canJump = true;
     }
   }
-
+  //console.log(JSON.stringify(getState()));
   prevTime = time;
 
   stats.update();
-  
+
   const delta = clock.getDelta();
 
   renderer.render(scene, camera);

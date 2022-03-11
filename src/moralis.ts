@@ -24,6 +24,6 @@ export class MoralisProvider implements NFTProvider {
   }
 
   async saveFile(file: string, data: any) {
-    await moralisSave(file, data);
+    return await moralisSave(file, data);
   }
 }

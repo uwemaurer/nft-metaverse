@@ -56,4 +56,5 @@ export async function moralisGetNFTs(address) {
 export async function moralisSave(fileName, object) {
   const file = new Moralis.File(fileName, {base64 : btoa(JSON.stringify(object))});
   await file.saveIPFS();
+  return file;
 }
