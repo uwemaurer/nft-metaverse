@@ -3,15 +3,21 @@
     <div class="instructions">
       <h1>NFT Metaverse</h1>
       {{ user }}
-      <button class="button" style="margin-bottom: 15px" @click="connect" v-if="!user">
-        Login
-      </button>
-       <button class="button" style="margin-bottom: 15px" @click="logout" v-else>
-        Logout
-      </button>
-      <button class="button" style="margin-bottom: 15px" @click="enterMetaverse">
-        Click to enter
-      </button>
+      <button class="btn btn-lg btn-primary mb-2" @click="connect" v-if="!user">Login</button>
+      <button class="btn btn-lg btn-primary mb-2" @click="logout" v-else>Logout</button>
+      <button class="btn btn-lg btn-primary mb-2" @click="enterMetaverse">Click to enter</button>
+
+      <div class="mb-3">
+        <label for="input1" class="form-label">IPFS metaverse</label>
+        <input
+          type="url"
+          class="form-control"
+          id="input1"
+          placeholder="content identifier or URL"
+          v-model="ipfsUrl"
+        />
+      </div>
+
       <div>
         Move: WASD<br />
         Jump: SPACE<br />
@@ -24,6 +30,7 @@
 import { ref } from 'vue';
 import { enterMetaverse } from '../metaverse';
 import { moralisCurrentAddress, moralisLogin, moralisLogout } from '../moralis-helper';
+import { ipfsUrl } from '../main';
 
 defineProps({
   msg: String,
@@ -36,6 +43,7 @@ async function connect() {
   await moralisLogin();
   user.value = moralisCurrentAddress();
 }
+
 async function logout() {
   await moralisLogout();
   user.value = moralisCurrentAddress();
@@ -49,9 +57,6 @@ async function logout() {
   background-color: rgba(0, 0, 0, 0.5);
 }
 
-a {
-  color: #42b983;
-}
 .instructions {
   width: 100%;
   height: 100%;
@@ -63,9 +68,5 @@ a {
 
   text-align: center;
   font-size: 14px;
-  cursor: pointer;
-}
-.button {
-  font-size: 36px;
 }
 </style>

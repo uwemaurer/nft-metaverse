@@ -1,4 +1,4 @@
-import { createApp, watch } from 'vue';
+import { createApp, ref, watch } from 'vue';
 import App from './App.vue';
 import { init, animate, metaverseActive, getState } from './metaverse';
 import { NFTProvider, DemoNFTs } from './nft-api';
@@ -6,6 +6,8 @@ import { addPainting } from './generateWorld';
 import { MoralisProvider } from './moralis';
 import { NFTPortProvider } from './NFTport';
 import { moralisInit, moralisLogin } from './moralis-helper';
+
+export const ipfsUrl = ref('');
 
 async function main() {
   const goofballCommunityAddress = '0x56addf051984b4cc93102673fcfa9d157a0487c8';
@@ -36,8 +38,10 @@ async function main() {
         const state = getState();
         //console.log(JSON.stringify(getState()));
 
-        const file = await moralis.saveFile("metaverse.json", {state});
+        const file = await moralis.saveFile("metaverse.json", {state, nfts});
         console.log(file);
+        ipfsUrl.value = file.ipfs();
+        //ipfsUrl.value = file.hash();
     }
   });
 }
