@@ -32,11 +32,11 @@ const clock = new THREE.Clock();
 
 export function init() {
   stats = Stats()
-  camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
+  camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 1, 1000);
   camera.position.y = 10;
 
   scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x000000);
+  scene.background = new THREE.Color(0xeeeeee);
   scene.fog = new THREE.FogExp2(0x000000, 0.01);
 
   const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.6);
@@ -153,13 +153,13 @@ export function init() {
 
   const loader = new THREE.TextureLoader();
 
-  // const sky = loader.load(
-  //   'sunflowers.jpg',
-  //   () => {
-  //     const rt = new THREE.WebGLCubeRenderTarget(sky.image.height);
-  //     rt.fromEquirectangularTexture(renderer, sky);
-  //     scene.background = rt.texture;
-  //   });
+  const sky = loader.load(
+    'sunflowers.jpg',
+    () => {
+      const rt = new THREE.WebGLCubeRenderTarget(sky.image.height);
+      rt.fromEquirectangularTexture(renderer, sky);
+      scene.background = rt.texture;
+    });
 
   // floor
   let floorGeometry: THREE.BufferGeometry = new THREE.PlaneGeometry(1000, 1000, 1, 1);
@@ -169,7 +169,7 @@ export function init() {
   // mip mapping is default
   // floorTex.minFilter = THREE.LinearFilter;
   floorTex.wrapS = floorTex.wrapT = THREE.RepeatWrapping;
-  floorTex.repeat.set(100, 100);
+  floorTex.repeat.set(800, 800);
   const floorMaterial = new THREE.MeshLambertMaterial({ map: floorTex });
   const floor = new THREE.Mesh(floorGeometry, floorMaterial);
   floor.receiveShadow = true;
@@ -230,6 +230,9 @@ function onWindowResize() {
   renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
+// units in meter
+const eyeHeight = 1.8;
+
 export function animate() {
   requestAnimationFrame(animate);
 
@@ -254,8 +257,8 @@ export function animate() {
     direction.x = Number(moveRight) - Number(moveLeft);
     direction.normalize(); // this ensures consistent movements in all directions
 
-    if (moveForward || moveBackward) velocity.z -= direction.z * 400.0 * delta;
-    if (moveLeft || moveRight) velocity.x -= direction.x * 400.0 * delta;
+    if (moveForward || moveBackward) velocity.z -= direction.z * 100.0 * delta;
+    if (moveLeft || moveRight) velocity.x -= direction.x * 100.0 * delta;
 
     if (onObject === true) {
       velocity.y = Math.max(0, velocity.y);
@@ -267,9 +270,9 @@ export function animate() {
 
     controls.getObject().position.y += velocity.y * delta; // new behavior
 
-    if (controls.getObject().position.y < 10) {
+    if (controls.getObject().position.y < eyeHeight) {
       velocity.y = 0;
-      controls.getObject().position.y = 10;
+      controls.getObject().position.y = eyeHeight;
 
       canJump = true;
     }
@@ -278,8 +281,9 @@ export function animate() {
   prevTime = time;
 
   stats.update();
-  renderer.render(scene, camera);
+  
   const delta = clock.getDelta();
 
+  renderer.render(scene, camera);
   //composer.render( delta );
 }
