@@ -7,7 +7,7 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
 import { FilmPass } from 'three/examples/jsm/postprocessing/FilmPass';
 import { createMaze } from './generateWorld';
 
-let camera, scene, renderer, controls;
+let camera, scene:THREE.Scene, renderer, controls;
 
 const objects = [];
 
@@ -37,40 +37,16 @@ export function init() {
 
   scene = new THREE.Scene();
   scene.background = new THREE.Color(0xeeeeee);
-  scene.fog = new THREE.FogExp2(0x000000, 0.01);
+  //scene.fog = new THREE.FogExp2(0x000000, 0.01);
 
-  const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.6);
+  const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.7);
   //hemiLight.color.setHSL( 0.6, 1, 0.6 );
   //hemiLight.groundColor.setHSL( 0.095, 1, 0.75 );
-  hemiLight.position.set(0, 50, 0);
+  hemiLight.position.set(0, 20, 0);
   scene.add(hemiLight);
 
   //const hemiLightHelper = new THREE.HemisphereLightHelper(hemiLight, 10);
   //scene.add(hemiLightHelper);
-
-  const dirLight = new THREE.DirectionalLight(0xffffff, 0.9);
-  //dirLight.color.setHSL(0.1, 1, 0.95);
-  dirLight.position.set(-1, 1.75, 1);
-  dirLight.position.multiplyScalar(100);
-  scene.add(dirLight);
-
-  dirLight.castShadow = true;
-
-  dirLight.shadow.mapSize.width = 2048;
-  dirLight.shadow.mapSize.height = 2048;
-
-  const d = 50;
-
-  dirLight.shadow.camera.left = -d;
-  dirLight.shadow.camera.right = d;
-  dirLight.shadow.camera.top = d;
-  dirLight.shadow.camera.bottom = -d;
-
-  dirLight.shadow.camera.far = 3500;
-  dirLight.shadow.bias = -0.0001;
-
-  // const dirLightHelper = new THREE.DirectionalLightHelper(dirLight, 10);
-  // scene.add(dirLightHelper);
 
   controls = new PointerLockControls(camera, document.body);
 
@@ -92,6 +68,7 @@ export function init() {
   });
 
   scene.add(controls.getObject());
+  controls.getObject().position.y = eyeHeight;
 
   const onKeyDown = function (event) {
     switch (event.code) {
@@ -161,29 +138,16 @@ export function init() {
       scene.background = rt.texture;
     });
 
-  // floor
-  let floorGeometry: THREE.BufferGeometry = new THREE.PlaneGeometry(1000, 1000, 1, 1);
-  floorGeometry.rotateX(-Math.PI / 2);
-  const floorTex = loader.load('/metal.jpg');
-
-  // mip mapping is default
-  // floorTex.minFilter = THREE.LinearFilter;
-  floorTex.wrapS = floorTex.wrapT = THREE.RepeatWrapping;
-  floorTex.repeat.set(800, 800);
-  const floorMaterial = new THREE.MeshLambertMaterial({ map: floorTex });
-  const floor = new THREE.Mesh(floorGeometry, floorMaterial);
-  floor.receiveShadow = true;
-  scene.add(floor);
-
-  const maze = createMaze();
+  const maze = createMaze(scene);
   scene.add(maze);
-  createBoxes();
+  //createBoxes();
 
   renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
   //renderer.outputEncoding = THREE.sRGBEncoding;
   renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap ; //PCFSoftShadowMap
 
   document.body.appendChild(renderer.domElement);
   window.addEventListener('resize', onWindowResize);
@@ -198,12 +162,11 @@ export function init() {
   composer.addPass( effectFilm );
 }
 
-
 function createBoxes() {
   // objects
   const boxGeometry = new THREE.BoxGeometry(10, 10, 10).toNonIndexed();
 
-  for (let i = 0; i < 30; i++) {
+  for (let i = 0; i < 10; i++) {
     const url = `https://goofballs.finemints.com/nft/${i + 174}.png`;
     const texture = new THREE.TextureLoader().load(url);
 
