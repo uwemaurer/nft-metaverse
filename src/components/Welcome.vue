@@ -8,9 +8,7 @@
       <button class="btn btn-lg btn-primary mb-1" @click="connect" v-if="!user">Login</button>
       <button class="btn btn-lg btn-primary mb-1" @click="logout" v-else>Logout</button>
       
-   
-
-      <div class="mb-3">
+      <div class="my-3">
         <label for="input1" class="form-label">Metaverse name</label>
         <input
           type="text"
@@ -21,12 +19,13 @@
         />
       </div>
 
-         <button class="btn btn-lg btn-primary mb-1" @click="saveMetaverse">Save</button>
+      <button class="btn btn-lg btn-primary mb-1" :disabled="!user" @click="saveMetaverse">Save to IPFS</button>
+      <div v-if="!user" class="badge bg-warning text-dark">Login to enable saving</div>
 
       <a :href="ipfsUrl" v-if="ipfsUrl">IPFS Data</a>
       <a :href="`/?ipfs=${ipfsHash}`" v-if="ipfsHash" >{{metaverseName}}</a>
 
-      <div>
+      <div class="mt-2">
         Move: WASD<br />
         Jump: SPACE<br />
         Look: Mouse

@@ -34,8 +34,8 @@ const clock = new THREE.Clock();
 export const metaverseActive = ref(false);
 
 export function enterMetaverse() {
-  controls.lock();
   startAnim();
+  controls.lock();
 }
 
 /** Save the state, currently just camera position */
@@ -63,6 +63,8 @@ export function pauseAnim() {
 
 export function startAnim() {
   runAnimation = true;
+  // reset time, otherwise if it was paused during movement, the player does a huge step
+  prevTime = performance.now();
   requestAnimationFrame(animate);
 }
 

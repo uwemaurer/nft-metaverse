@@ -36,13 +36,13 @@ async function main() {
 
   startAnim();
   animate();
-  // animate for 5 seconds so that the textures load and the metaverse gets displayed
+  // animate for 15 seconds so that the textures load and the metaverse gets displayed
   // if the menu is still visible after timeout pause the rendering
   setTimeout(() => {
     if (!metaverseActive.value) {
       pauseAnim();
     }
-  }, 5000);
+  }, 15000);
 
   for (const nft of nfts) {
     // console.log(nft);
