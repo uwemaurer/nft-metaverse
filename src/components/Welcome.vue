@@ -1,22 +1,30 @@
 <template>
   <div id="blocker" class="blocker">
     <div class="instructions">
-      <h1>NFT Metaverse</h1>
+      <h1>{{metaverseName}}</h1>
       {{ user }}
-      <button class="btn btn-lg btn-primary mb-2" @click="connect" v-if="!user">Login</button>
-      <button class="btn btn-lg btn-primary mb-2" @click="logout" v-else>Logout</button>
-      <button class="btn btn-lg btn-primary mb-2" @click="enterMetaverse">Click to enter</button>
+      <button class="btn btn-lg btn-primary mb-3" @click="enterMetaverse">Click to enter</button>
+
+      <button class="btn btn-lg btn-primary mb-1" @click="connect" v-if="!user">Login</button>
+      <button class="btn btn-lg btn-primary mb-1" @click="logout" v-else>Logout</button>
+      
+   
 
       <div class="mb-3">
-        <label for="input1" class="form-label">IPFS metaverse</label>
+        <label for="input1" class="form-label">Metaverse name</label>
         <input
-          type="url"
+          type="text"
           class="form-control"
           id="input1"
-          placeholder="content identifier or URL"
-          v-model="ipfsUrl"
+          placeholder="Name of this metaverse"
+          v-model="metaverseName"
         />
       </div>
+
+         <button class="btn btn-lg btn-primary mb-1" @click="saveMetaverse">Save</button>
+
+      <a :href="ipfsUrl" v-if="ipfsUrl">IPFS Data</a>
+      <a :href="`/?ipfs=${ipfsHash}`" v-if="ipfsHash" >{{metaverseName}}</a>
 
       <div>
         Move: WASD<br />
@@ -30,7 +38,7 @@
 import { ref } from 'vue';
 import { enterMetaverse } from '../metaverse';
 import { moralisCurrentAddress, moralisLogin, moralisLogout } from '../moralis-helper';
-import { ipfsUrl } from '../main';
+import { ipfsUrl, ipfsHash, metaverseName, saveMetaverse } from '../main';
 
 defineProps({
   msg: String,
@@ -48,6 +56,7 @@ async function logout() {
   await moralisLogout();
   user.value = moralisCurrentAddress();
 }
+
 </script>
 <style scoped>
 .blocker {

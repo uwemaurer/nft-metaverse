@@ -32,12 +32,14 @@ let composer: EffectComposer;
 const clock = new THREE.Clock();
 
 export const metaverseActive = ref(false);
+
 export function enterMetaverse() {
   controls.lock();
+  startAnim();
 }
 
 /** Save the state, currently just camera position */
-interface State {
+export interface State {
   position: number[];
   rotation: number[];
 }
@@ -51,6 +53,17 @@ export function restoreState(state:State) {
   controls.getObject().position.fromArray(state.position);
   controls.getObject().rotation.fromArray(state.rotation);
   controls.getObject().updateMatrix();
+}
+
+let runAnimation = false;
+
+export function pauseAnim() {
+  runAnimation = false;
+}
+
+export function startAnim() {
+  runAnimation = true;
+  requestAnimationFrame(animate);
 }
 
 export function init() {
@@ -75,10 +88,12 @@ export function init() {
 
   controls.addEventListener('lock', function () {
     metaverseActive.value = true;
+    startAnim();
   });
 
   controls.addEventListener('unlock', function () {
     metaverseActive.value = false;
+    pauseAnim();
   });
 
   scene.add(controls.getObject());
@@ -212,7 +227,9 @@ function onWindowResize() {
 const eyeHeight = 1.8;
 
 export function animate() {
-  requestAnimationFrame(animate);
+  if (runAnimation) {
+    requestAnimationFrame(animate);
+  }
 
   const time = performance.now();
 
