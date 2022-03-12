@@ -8,11 +8,11 @@ import { FilmPass } from 'three/examples/jsm/postprocessing/FilmPass';
 import { createMaze } from './generateWorld';
 import { ref } from 'vue';
 
-let camera, scene: THREE.Scene, renderer, controls: PointerLockControls;
+let camera: THREE.Camera, scene: THREE.Scene, renderer, controls: PointerLockControls;
 
 const objects = [];
 
-let raycaster;
+let raycaster: THREE.Raycaster;
 
 let moveForward = false;
 let moveBackward = false;
@@ -70,8 +70,8 @@ export function startAnim() {
 
 export function init() {
   stats = Stats();
-  camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 1, 1000);
-  camera.position.y = 10;
+  camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 500);
+  camera.position.y = eyeHeight;
 
   scene = new THREE.Scene();
   scene.background = new THREE.Color(0xeeeeee);
@@ -127,7 +127,7 @@ export function init() {
         break;
 
       case 'Space':
-        if (canJump === true) velocity.y += 350;
+        if (canJump === true) velocity.y += 5;
         canJump = false;
         break;
     }
@@ -160,7 +160,7 @@ export function init() {
   document.addEventListener('keydown', onKeyDown);
   document.addEventListener('keyup', onKeyUp);
 
-  raycaster = new THREE.Raycaster(new THREE.Vector3(), new THREE.Vector3(0, -1, 0), 0, 10);
+  raycaster = new THREE.Raycaster(new THREE.Vector3(), new THREE.Vector3(0, -1, 0), 0, 5);
 
   const loader = new THREE.TextureLoader();
 
@@ -172,6 +172,7 @@ export function init() {
 
   const maze = createMaze(scene);
   scene.add(maze);
+  objects.push(maze);
   //createBoxes();
 
   renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -227,6 +228,8 @@ function onWindowResize() {
 
 // units in meter
 const eyeHeight = 1.8;
+const moveSpeed = 50;
+
 
 export function animate() {
   if (runAnimation) {
@@ -236,43 +239,47 @@ export function animate() {
   const time = performance.now();
 
   if (controls.isLocked === true) {
-    raycaster.ray.origin.copy(controls.getObject().position);
-    raycaster.ray.origin.y -= 10;
-
-    const intersections = raycaster.intersectObjects(objects, false);
-
-    const onObject = intersections.length > 0;
-
+    raycaster.set(controls.getObject().position, new THREE.Vector3(0, -1, 0));
+    const intersections = raycaster.intersectObjects(objects, true);
+    const onGround = intersections.length > 0 && intersections[0].distance <= eyeHeight;
+    
     const delta = (time - prevTime) / 1000;
 
-    velocity.x -= velocity.x * 10.0 * delta;
-    velocity.z -= velocity.z * 10.0 * delta;
+    velocity.x -= velocity.x * 10 * delta;
+    velocity.z -= velocity.z * 10 * delta;
 
-    velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass
+    velocity.y -= 9.81 * delta; 
 
     direction.z = Number(moveForward) - Number(moveBackward);
     direction.x = Number(moveRight) - Number(moveLeft);
     direction.normalize(); // this ensures consistent movements in all directions
 
-    if (moveForward || moveBackward) velocity.z -= direction.z * 100.0 * delta;
-    if (moveLeft || moveRight) velocity.x -= direction.x * 100.0 * delta;
+    velocity.z -= direction.z * 50.0 * delta;
+    velocity.x -= direction.x * 50.0 * delta;
 
-    if (onObject === true) {
+    if (onGround === true) {
       velocity.y = Math.max(0, velocity.y);
+      if (intersections[0].distance < eyeHeight) {
+        controls.getObject().position.y = intersections[0].point.y + eyeHeight;
+      }
       canJump = true;
     }
-
+    const oldPos = controls.getObject().position.clone();
     controls.moveRight(-velocity.x * delta);
     controls.moveForward(-velocity.z * delta);
+    const move = controls.getObject().position.clone().sub(oldPos);
+    const dist = move.length();
+    raycaster.set(controls.getObject().position, move.normalize());
+    const intersectionsWall = raycaster.intersectObjects(objects, true);
+    const hitWall = intersectionsWall.length > 0 && intersectionsWall[0].distance < dist + 0.30;
+    
+    if (hitWall) {
+      velocity.x = 0;
+      velocity.z = 0;
+      controls.getObject().position.copy(oldPos);
+    } 
 
     controls.getObject().position.y += velocity.y * delta; // new behavior
-
-    if (controls.getObject().position.y < eyeHeight) {
-      velocity.y = 0;
-      controls.getObject().position.y = eyeHeight;
-
-      canJump = true;
-    }
   }
   //console.log(JSON.stringify(getState()));
   prevTime = time;
