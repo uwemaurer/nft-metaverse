@@ -36,24 +36,23 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { enterMetaverse } from '../metaverse';
-import { moralisCurrentAddress, moralisLogin, moralisLogout } from '../moralis-helper';
-import { ipfsUrl, ipfsHash, metaverseName, saveMetaverse } from '../main';
+import { ipfsUrl, ipfsHash, metaverseName, saveMetaverse, loginProvider } from '../main';
 
 defineProps({
   msg: String,
 });
 
 const count = ref(0);
-const user = ref(moralisCurrentAddress());
+const user = ref(loginProvider.currentAddress());
 
 async function connect() {
-  await moralisLogin();
-  user.value = moralisCurrentAddress();
+  await loginProvider.login();
+  user.value = loginProvider.currentAddress();
 }
 
 async function logout() {
-  await moralisLogout();
-  user.value = moralisCurrentAddress();
+  await loginProvider.logout();
+  user.value = loginProvider.currentAddress();
 }
 
 </script>

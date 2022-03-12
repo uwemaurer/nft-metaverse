@@ -1,5 +1,5 @@
-import { moralisGetNFTs, moralisInit, moralisSave } from './moralis-helper';
-import { NFT, NFTProvider } from './nft-api';
+import { moralisCurrentAddress, moralisGetNFTs, moralisInit, moralisLogin, moralisLogout, moralisSave } from './moralis-helper';
+import { NFT, NFTProvider, LoginProvider } from './nft-api';
 import { ref } from 'vue';
 
 export const currentAddress = ref(null as string | null);
@@ -27,3 +27,19 @@ export class MoralisProvider implements NFTProvider {
     return await moralisSave(file, data);
   }
 }
+
+class MoralisLoginProvider implements LoginProvider {
+  async login(): Promise<void> {
+    await moralisLogin();
+  }
+  
+  async logout(): Promise<void> {
+    await moralisLogout();
+  }
+
+  currentAddress(): string {
+    return moralisCurrentAddress();
+  }
+}
+
+export const moralisLoginProvider = new MoralisLoginProvider();

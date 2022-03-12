@@ -3,9 +3,10 @@ import App from './App.vue';
 import { init, animate, metaverseActive, getState, pauseAnim, startAnim, State, restoreState } from './metaverse';
 import { NFTProvider, DemoNFTs, NFT } from './nft-api';
 import { addPainting } from './generateWorld';
-import { MoralisProvider } from './moralis';
+import { MoralisProvider, moralisLoginProvider } from './moralis';
 import { NFTPortProvider } from './NFTport';
-import { moralisInit, moralisLogin } from './moralis-helper';
+import { moralisInit } from './moralis-helper';
+import { sequenceLoginProvider } from './sequence';
 
 export const ipfsUrl = ref('');
 export const ipfsHash = ref('');
@@ -13,6 +14,8 @@ export const metaverseName = ref('NFT Metaverse');
 
 const moralis = new MoralisProvider();
 let nfts = [] as NFT[];
+//export const loginProvider = moralisLoginProvider;
+export const loginProvider = sequenceLoginProvider;
 
 async function main() {
   const goofballCommunityAddress = '0x56addf051984b4cc93102673fcfa9d157a0487c8';

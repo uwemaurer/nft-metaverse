@@ -19,6 +19,14 @@ export interface NFTProvider {
   getNFTs(address: string): Promise<NFT[]>;
 }
 
+
+export interface LoginProvider {
+    login(): Promise<void>;
+    logout(): Promise<void>;
+    currentAddress(): string | null;
+}
+
+
 export class DemoNFTs implements NFTProvider {
   private rnd = random.clone(seedrandom('demo demo'));
   getNFTs(address: string): Promise<NFT[]> {

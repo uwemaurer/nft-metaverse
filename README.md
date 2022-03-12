@@ -25,8 +25,8 @@ Web3
 ---
 - Save state (player position, name of metaverse, NFT images) in IPFS
 - Restore state from IPFS to make the metaverse shareable
-- Web3 login using Moralis API / Metamask
-- Fetching of NFT metadata using Moralis API and NFTLand API
+- Web3 login using Moralis or Sequence
+- Fetching of NFT metadata using Moralis API and NFTPort API
 
 Demo Deployment
 ---

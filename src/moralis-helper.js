@@ -6,7 +6,6 @@
 
 let init = false;
 
-
 export async function moralisInit() {
   if (init) {
     return;
@@ -18,7 +17,7 @@ export async function moralisInit() {
 }
 
 export function moralisCurrentAddress() {
-  const user =  Moralis.User.current();
+  const user = Moralis.User.current();
   return user ? user.get('ethAddress') : null;
 }
 
@@ -26,13 +25,14 @@ export function moralisCurrentAddress() {
 export async function moralisLogin() {
   let user = Moralis.User.current();
   if (!user) {
-    return await Moralis.authenticate({ signingMessage: 'Log in using Moralis' })
-      .then(function (user) {
-        console.log('logged in user:', user);
-        const address = user.get('ethAddress');
-        console.log(address);
-        return user;
-      });
+    return await Moralis.authenticate({ signingMessage: 'Log in using Moralis' }).then(function (
+      user
+    ) {
+      console.log('logged in user:', user);
+      const address = user.get('ethAddress');
+      console.log(address);
+      return user;
+    });
   } else {
     return user;
   }
@@ -43,18 +43,16 @@ export async function moralisLogout() {
   console.log('logged out');
 }
 
-
-export async function moralisGetNFTs(address) {  
+export async function moralisGetNFTs(address) {
   const options = {
-    chain: "mainnet",
+    chain: 'mainnet',
     address,
   };
   return await Moralis.Web3API.account.getNFTs(options);
 }
 
-
 export async function moralisSave(fileName, object) {
-  const file = new Moralis.File(fileName, {base64 : btoa(JSON.stringify(object))});
+  const file = new Moralis.File(fileName, { base64: btoa(JSON.stringify(object)) });
   await file.saveIPFS();
   return file;
 }
