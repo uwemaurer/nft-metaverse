@@ -28,6 +28,8 @@ export class MoralisProvider implements NFTProvider {
   }
 }
 
+export const moralis = new MoralisProvider();
+
 class MoralisLoginProvider implements LoginProvider {
   async login(): Promise<void> {
     await moralisLogin();

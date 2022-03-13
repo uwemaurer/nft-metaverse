@@ -12,6 +12,7 @@ interface WallLocation {
 }
 
 const location = [] as WallLocation[];
+const paintings = [] as THREE.Group[];
 let locIndex = 0;
 let mazeGroup: THREE.Group;
 
@@ -198,6 +199,14 @@ export function addPainting(url: string) {
     painting.position.z = loc.y;
     painting.position.y = 0;
     mazeGroup.add(painting);
+}
+
+export function clearPaintings() {
+  locIndex = 0;
+  for (const p of paintings) {
+    p.removeFromParent();
+  }
+  paintings.length = 0;
 }
 
 function createPainting(url: string) {

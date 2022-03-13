@@ -1,9 +1,9 @@
 <template>
   <div id="blocker" class="blocker">
     <div class="instructions">
-      <h1>{{metaverseName}}</h1>
+      <h1 class="huge">{{metaverseName}}</h1>
       {{ user }}
-      <button class="btn btn-lg btn-primary mb-3" @click="enterMetaverse">Click to enter</button>
+      <button class="btn btn-lg btn-primary mb-3" v-if="enterAvailable" @click="enterMetaverse">Click to enter</button>
 
       <button class="btn btn-lg btn-primary mb-1" @click="connect" v-if="!user">Login</button>
       <button class="btn btn-lg btn-primary mb-1" @click="logout" v-else>Logout</button>
@@ -34,26 +34,29 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { enterMetaverse } from '../metaverse';
-import { ipfsUrl, ipfsHash, metaverseName, saveMetaverse, loginProvider } from '../main';
+import { ipfsUrl, ipfsHash, metaverseName, saveMetaverse, loginProvider, loadUserNfts, nfts, user } from '../main';
+
+const enterAvailable = computed(() => !!user.value || nfts.value.length > 0);
 
 defineProps({
   msg: String,
 });
 
 const count = ref(0);
-const user = ref(loginProvider.currentAddress());
 
 async function connect() {
   await loginProvider.login();
   user.value = loginProvider.currentAddress();
+  await loadUserNfts(user.value);
 }
 
 async function logout() {
   await loginProvider.logout();
   user.value = loginProvider.currentAddress();
 }
+
 
 </script>
 <style scoped>
@@ -75,5 +78,8 @@ async function logout() {
 
   text-align: center;
   font-size: 14px;
+}
+.huge {
+  font-size: 80px;
 }
 </style>

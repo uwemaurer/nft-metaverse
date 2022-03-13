@@ -1,25 +1,36 @@
 import { createApp, ref, watch } from 'vue';
 import App from './App.vue';
-import { init, animate, metaverseActive, getState, pauseAnim, startAnim, State, restoreState } from './metaverse';
+import {
+  init,
+  animate,
+  metaverseActive,
+  getState,
+  pauseAnim,
+  startAnim,
+  State,
+  restoreState,
+} from './metaverse';
 import { NFTProvider, DemoNFTs, NFT } from './nft-api';
-import { addPainting } from './generateWorld';
-import { MoralisProvider, moralisLoginProvider } from './moralis';
+import { addPainting, clearPaintings } from './generateWorld';
+import { moralis, MoralisProvider, moralisLoginProvider } from './moralis';
 import { NFTPortProvider } from './NFTport';
 import { moralisInit } from './moralis-helper';
 import { sequenceLoginProvider } from './sequence';
+import { useRafFn } from '@vueuse/core';
 
 export const ipfsUrl = ref('');
 export const ipfsHash = ref('');
 export const metaverseName = ref('NFT Metaverse');
 
-const moralis = new MoralisProvider();
-let nfts = [] as NFT[];
-//export const loginProvider = moralisLoginProvider;
-export const loginProvider = sequenceLoginProvider;
+export const nfts = ref([] as NFT[]);
+export const loginProvider = moralisLoginProvider;
+// export const loginProvider = sequenceLoginProvider;
+const goofballCommunityAddress = '0x56addf051984b4cc93102673fcfa9d157a0487c8';
+export const user = ref(null as string|null);
 
-async function main() {
-  const goofballCommunityAddress = '0x56addf051984b4cc93102673fcfa9d157a0487c8';
+async function main() {  
   await moralisInit();
+  user.value = loginProvider.currentAddress();
 
   createApp(App).mount('#app');
 
@@ -30,11 +41,17 @@ async function main() {
 
   if (hash) {
     await loadMetaverse(hash);
+    console.log("loaded");
+    for (const nft of nfts.value) {
+      addPainting(nft.imageUrl);
+    }
+  } else if (user.value) {
+    loadUserNfts(user.value);
   } else {
     const provider = new DemoNFTs() as NFTProvider;
     //const provider = moralis as NFTProvider;
     // const provider = new NFTPortProvider() as NFTProvider;
-    nfts = await provider.getNFTs(goofballCommunityAddress);
+    //nfts.value = await provider.getNFTs(goofballCommunityAddress);
   }
 
   startAnim();
@@ -47,17 +64,28 @@ async function main() {
     }
   }, 15000);
 
-  for (const nft of nfts) {
-    // console.log(nft);
-    addPainting(nft.imageUrl);
-  }
-
   watch(metaverseActive, async () => {
     console.log(`active ${metaverseActive.value}`);
     // save state when user leaves metaverse
     if (!metaverseActive.value) {
     }
   });
+}
+
+const demo = true;
+
+export async function loadUserNfts(address: string) {
+  clearPaintings();
+  let provider = moralis as NFTProvider;
+  if (demo) {
+    address = goofballCommunityAddress;
+    provider = new DemoNFTs();
+  }
+  
+  nfts.value = await provider.getNFTs(address);
+  for (const nft of nfts.value) {
+    addPainting(nft.imageUrl);
+  }
 }
 
 main();
@@ -70,7 +98,11 @@ interface PersistedState {
 
 export async function saveMetaverse() {
   const state = getState();
-  const file = await moralis.saveFile('metaverse.json', { name: metaverseName.value, state, nfts } as PersistedState);
+  const file = await moralis.saveFile('metaverse.json', {
+    name: metaverseName.value,
+    state,
+    nfts: nfts.value,
+  } as PersistedState);
   console.log(file);
   ipfsUrl.value = file.ipfs();
   ipfsHash.value = file.hash();
@@ -78,11 +110,12 @@ export async function saveMetaverse() {
 
 // load saved state from IPFS
 async function loadMetaverse(hash: string) {
-  ipfsUrl.value = `https://dweb.link/ipfs/${hash}`;
+  //ipfsUrl.value = `https://dweb.link/ipfs/${hash}`;
+  ipfsUrl.value = `https://ipfs.moralis.io:2053/ipfs/${hash}`;
   ipfsHash.value = hash;
   const response = await fetch(ipfsUrl.value);
-  const saveState = await response.json() as PersistedState;
+  const saveState = (await response.json()) as PersistedState;
   metaverseName.value = saveState.name;
   restoreState(saveState.state);
-  nfts = saveState.nfts;
+  nfts.value = saveState.nfts;
 }
