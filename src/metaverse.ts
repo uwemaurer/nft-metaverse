@@ -8,7 +8,7 @@ import { FilmPass } from 'three/examples/jsm/postprocessing/FilmPass';
 import { createMaze } from './generateWorld';
 import { ref } from 'vue';
 
-let camera: THREE.Camera, scene: THREE.Scene, renderer, controls: PointerLockControls;
+let camera: THREE.PerspectiveCamera, scene: THREE.Scene, renderer, controls: PointerLockControls;
 
 const objects = [];
 
@@ -181,18 +181,17 @@ export function init() {
   //renderer.outputEncoding = THREE.sRGBEncoding;
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap; //PCFSoftShadowMap
-
+  
   document.body.appendChild(renderer.domElement);
   window.addEventListener('resize', onWindowResize);
   document.body.appendChild(stats.dom);
 
-  const renderModel = new RenderPass(scene, camera);
-  const effectFilm = new FilmPass(0.35, 0.75, 2048, 0.2);
+  // const renderModel = new RenderPass(scene, camera);
+  // const effectFilm = new FilmPass(0.35, 0.75, 2048, 0.2);
 
-  composer = new EffectComposer(renderer);
-
-  composer.addPass(renderModel);
-  composer.addPass(effectFilm);
+  //composer = new EffectComposer(renderer);
+  // composer.addPass(renderModel);
+  // composer.addPass(effectFilm);
 }
 
 function createBoxes() {

@@ -2,8 +2,19 @@
   <div id="blocker" class="blocker">
     <div class="instructions">
       <h1 class="huge">{{metaverseName}}</h1>
-      {{ user }}
-      <button class="btn btn-lg btn-primary mb-3" v-if="enterAvailable" @click="enterMetaverse">Click to enter</button>
+
+      <div class="my-3">
+        <label for="input2" class="form-label">Wallet Address</label>
+        <input
+          type="text"
+          class="form-control"
+          id="input2"
+          placeholder="Address"
+          v-model="address"
+        />
+      </div>
+
+      <button class="btn btn-lg btn-primary mb-3" v-if="enterAvailable" @click="enterMetaverse">Enter Metaverse</button>
 
       <button class="btn btn-lg btn-primary mb-1" @click="connect" v-if="!user">Login</button>
       <button class="btn btn-lg btn-primary mb-1" @click="logout" v-else>Logout</button>
@@ -36,7 +47,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { enterMetaverse } from '../metaverse';
-import { ipfsUrl, ipfsHash, metaverseName, saveMetaverse, loginProvider, loadUserNfts, nfts, user } from '../main';
+import { ipfsUrl, ipfsHash, metaverseName, saveMetaverse, loginProvider, loadUserNfts, nfts, user, address } from '../main';
 
 const enterAvailable = computed(() => !!user.value || nfts.value.length > 0);
 
@@ -49,7 +60,7 @@ const count = ref(0);
 async function connect() {
   await loginProvider.login();
   user.value = loginProvider.currentAddress();
-  await loadUserNfts(user.value);
+  address.value = user.value;
 }
 
 async function logout() {

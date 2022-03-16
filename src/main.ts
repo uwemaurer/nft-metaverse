@@ -27,6 +27,7 @@ export const loginProvider = moralisLoginProvider;
 // export const loginProvider = sequenceLoginProvider;
 const goofballCommunityAddress = '0x56addf051984b4cc93102673fcfa9d157a0487c8';
 export const user = ref(null as string|null);
+export const address = ref(null as string|null);
 
 async function main() {  
   await moralisInit();
@@ -36,22 +37,24 @@ async function main() {
 
   let url = new URL(window.location.href);
   const hash = url.searchParams?.get('ipfs');
+  const address = url.searchParams?.get('address');
 
   init();
 
   if (hash) {
     await loadMetaverse(hash);
     console.log("loaded");
-    for (const nft of nfts.value) {
-      addPainting(nft.imageUrl);
-    }
+    setPaintings(nfts.value);
+  } else if (address) {
+    loadUserNfts(address);
   } else if (user.value) {
     loadUserNfts(user.value);
   } else {
     const provider = new DemoNFTs() as NFTProvider;
     //const provider = moralis as NFTProvider;
     // const provider = new NFTPortProvider() as NFTProvider;
-    //nfts.value = await provider.getNFTs(goofballCommunityAddress);
+    nfts.value = await provider.getNFTs(goofballCommunityAddress);
+    setPaintings(nfts.value);
   }
 
   startAnim();
@@ -72,10 +75,24 @@ async function main() {
   });
 }
 
-const demo = true;
+function setPaintings(nft:NFT[]) {
+  clearPaintings();
+  for (const nft of nfts.value) {
+    // fetch the images through an image proxy, this is needed to downsize them to 256
+    // and also to avoid CORS problems (Access-Control-Allow-Origin header) that the image can't be read into a texture
+    addPainting(`https://image-proxy.svc.prod.covalenthq.com/256,fit,png/${nft.imageUrl}`);
+  }
+}
+
+const demo = false;
+
+watch(address, () => {
+  if (address.value && address.value.length == 42) {
+    loadUserNfts(address.value);
+  }
+})
 
 export async function loadUserNfts(address: string) {
-  clearPaintings();
   let provider = moralis as NFTProvider;
   if (demo) {
     address = goofballCommunityAddress;
@@ -83,9 +100,7 @@ export async function loadUserNfts(address: string) {
   }
   
   nfts.value = await provider.getNFTs(address);
-  for (const nft of nfts.value) {
-    addPainting(nft.imageUrl);
-  }
+  setPaintings(nfts.value);
 }
 
 main();

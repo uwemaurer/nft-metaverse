@@ -6,9 +6,9 @@ const wallHeight = 3.7;
 const wallDepth = 0.1;
 
 interface WallLocation {
-    x: number;
-    y: number;
-    rotY: number;
+  x: number;
+  y: number;
+  rotY: number;
 }
 
 const location = [] as WallLocation[];
@@ -32,7 +32,7 @@ function createLight() {
   return spotLight;
 }
 
-export function createMaze(scene:THREE.Scene): THREE.Group {
+export function createMaze(scene: THREE.Scene): THREE.Group {
   type Cell = {
     x: number;
     y: number;
@@ -62,7 +62,7 @@ export function createMaze(scene:THREE.Scene): THREE.Group {
   const wallMaterial = new THREE.MeshPhongMaterial({ map: wallTex });
 
   const boxMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff });
-  
+
   //const boxMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true });
   const walls = [] as THREE.Mesh[];
 
@@ -112,8 +112,7 @@ export function createMaze(scene:THREE.Scene): THREE.Group {
   location.length = 0;
   locIndex = 0;
   const w = wallWidth;
-  // tiny distance from the wall to avoid Z-fighting
-  const wallDist = (wallWidth - wallDepth) / 2 - 0.001;
+  const wallDist = (wallWidth - wallDepth) / 2;
   for (const row of maze) {
     for (const cell of row) {
       const x = cell.x * w;
@@ -170,35 +169,53 @@ export function createMaze(scene:THREE.Scene): THREE.Group {
   //     }
   //   }
 
-  for (let i = 0; i < 5; i++ ) {
-    const light = createLight();
+  // for (let i = 0; i < 0; i++) {
+  //   const light = createLight();
 
-    scene.add(light);
-    light.target = new THREE.Object3D();
-    scene.add(light.target);
-    const x =(mazeW * Math.random()) * wallWidth;
-    const y =(mazeH * Math.random()) * wallWidth;
-    light.position.set(x, 10, y);
-    light.target.position.set(x + Math.random(), 0, y + Math.random());
-//    scene.add(new THREE.SpotLightHelper(light));
-  }
+  //   scene.add(light);
+  //   light.target = new THREE.Object3D();
+  //   scene.add(light.target);
+  //   const x = mazeW * Math.random() * wallWidth;
+  //   const y = mazeH * Math.random() * wallWidth;
+  //   light.position.set(x, 10, y);
+  //   light.target.position.set(x + Math.random(), 0, y + Math.random());
+  //   //    scene.add(new THREE.SpotLightHelper(light));
+  // }
+
+  // matches the light from the skybox
+
+  const directionalLight = new THREE.DirectionalLight( 0xffffff, 0.6 );
+  directionalLight.position.set( 5, 10, 1);
+  directionalLight.castShadow = true;
+  directionalLight.shadow.camera.right = 30;
+  directionalLight.shadow.camera.left = - 30;
+  directionalLight.shadow.camera.top	= 30;
+  directionalLight.shadow.camera.bottom = -30;
+  directionalLight.shadow.radius = 10;
+  directionalLight.shadow.bias = - 0.0006;
+  directionalLight.shadow.mapSize.width = 1024;
+  directionalLight.shadow.mapSize.height = 1024;
+  scene.add( directionalLight );
+  // scene.add(new THREE.DirectionalLightHelper(directionalLight));
+
   mazeGroup = group;
   return group;
 }
 
 export function addPainting(url: string) {
-    if (locIndex >= location.length) {
-        console.log("metaverse out of space");
-        return;
-    }
-    const loc = location[locIndex++];
-    
-    const painting = createPainting(url);
-    painting.rotateY(loc.rotY);
-    painting.position.x = loc.x;
-    painting.position.z = loc.y;
-    painting.position.y = 0;
-    mazeGroup.add(painting);
+  if (locIndex >= location.length) {
+    console.log('metaverse out of space');
+    return;
+  }
+  const loc = location[locIndex++];
+
+  const painting = createPainting(url);
+  painting.rotateY(loc.rotY);
+  painting.position.x = loc.x;
+  painting.position.z = loc.y;
+  painting.position.y = 0;
+  mazeGroup.add(painting);
+  paintings.push(painting);
 }
 
 export function clearPaintings() {
@@ -219,10 +236,16 @@ function createPainting(url: string) {
   const boxMaterial = new THREE.MeshLambertMaterial({ color: 'gray', wireframe: false });
 
   const paintingGeometry = new THREE.PlaneGeometry(w, h);
-  paintingGeometry.translate(0.0, wallHeight / 2 + 0.2, depth + 0.01);
+  paintingGeometry.translate(0.0, wallHeight / 2 + 0.2, depth);
 
   const texture = new THREE.TextureLoader().load(url);
-  const paintingMaterial = new THREE.MeshLambertMaterial({ map: texture, wireframe: false });
+  const paintingMaterial = new THREE.MeshLambertMaterial({
+    map: texture,
+    wireframe: false,
+    depthWrite: false,
+    polygonOffset: true,
+    polygonOffsetFactor: -0.5,
+  });
   //const boxMaterial = new THREE.MeshLambertMaterial({ color: 'green' });
   const group = new THREE.Group();
   group.add(new THREE.Mesh(paintingGeometry, paintingMaterial));
