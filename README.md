@@ -39,7 +39,7 @@ Rendering is based on WebGL using the Three.js library.
 
 - [Typescript](https://www.typescriptlang.org/)
 - [Vite](https://vitejs.dev/)
-- [Three.js](https://threejs.org/e)
+- [Three.js](https://threejs.org/)
 - Web3 APIs 
 
 
