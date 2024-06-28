@@ -39,7 +39,7 @@ Rendering is based on WebGL using the Three.js library.
 
 - [Typescript](https://www.typescriptlang.org/)
 - [Vite](https://vitejs.dev/)
-- [Three.js](https://threejs.org/e)
+- [Three.js](https://threejs.org/)
 - Web3 APIs 
 
 
@@ -51,3 +51,10 @@ Three JS Pointerlock demo:
 Artwork:
 - https://www.tilingtextures.com/
 - https://polyhaven.com/
+
+
+My latest projects:
+---
+
+- [Hackernews with AI recommendations](https://news.facts.dev)
+- [API and selfhosted projects](https://www.facts.dev)

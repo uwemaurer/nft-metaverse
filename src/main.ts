@@ -30,8 +30,8 @@ export const user = ref(null as string|null);
 export const address = ref(null as string|null);
 
 async function main() {  
-  await moralisInit();
-  user.value = loginProvider.currentAddress();
+  //await moralisInit();
+  //user.value = loginProvider.currentAddress();
 
   createApp(App).mount('#app');
 
@@ -80,7 +80,8 @@ function setPaintings(nft:NFT[]) {
   for (const nft of nfts.value) {
     // fetch the images through an image proxy, this is needed to downsize them to 256
     // and also to avoid CORS problems (Access-Control-Allow-Origin header) that the image can't be read into a texture
-    addPainting(`https://image-proxy.svc.prod.covalenthq.com/256,fit,png/${nft.imageUrl}`);
+    //addPainting(`https://image-proxy.svc.prod.covalenthq.com/256,fit,png/${nft.imageUrl}`);
+    addPainting(`${nft.imageUrl}`);
   }
 }
 
